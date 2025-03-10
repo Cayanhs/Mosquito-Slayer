@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosquito Slayer</title>
+    <link rel="shortcut icon" href="imagens/imagens/mosca.png" type="image/x-icon">
+    <link rel="stylesheet" href="estilo.css">
+    <script src="script.js"></script>
+</head>
+<body onresize="ajustaTamanhoPalcoJogo()">
+
+    <div class="painel">
+        <div class="vidas">
+            <img id="v1" src="imagens/imagens/coracao_cheio.png" alt="Vida 1">
+            <img id="v2" src="imagens/imagens/coracao_cheio.png" alt="Vida 2">
+            <img id="v3" src="imagens/imagens/coracao_cheio.png" alt="Vida 3">
+        </div>
+        <div class="conometro">
+            Tempo restante: <samp id="conometro">15</samp>
+        </div>
+    </div>
+
+    <script>
+        // Obtém o parâmetro "nivel" da URL
+        var nivel = new URLSearchParams(window.location.search).get('nivel');
+
+        // Definindo tempo com base no nível selecionado
+        if (nivel === 'normal') {
+            var criaMosquitoTempo = 5500;
+        } else if (nivel === 'dificil') {
+            var criaMosquitoTempo = 1500;
+        } else if (nivel === 'chuknorris') {
+            var criaMosquitoTempo = 750;
+        }
+
+        // Inicializa a contagem regressiva
+        var tempo = 15;
+        document.getElementById('conometro').innerHTML = tempo;
+
+        // Função para ajustar o tamanho do palco
+        var altura = 0, largura = 0;
+        function ajustaTamanhoPalcoJogo() {
+            altura = window.innerHeight;
+            largura = window.innerWidth;
+        }
+        ajustaTamanhoPalcoJogo();
+
+        // Função para criar mosquitos em posições aleatórias
+        var criaMosquito = setInterval(function() {
+            posicaoRandomica();
+        }, criaMosquitoTempo);
+
+        // Função do cronômetro
+        var conometro = setInterval(function () {
+            tempo -= 1;
+            if (tempo < 0) {
+                clearInterval(conometro);
+                clearInterval(criaMosquito);
+                window.location.href = 'vitoria.html';
+            } else {
+                document.getElementById('conometro').innerHTML = tempo;
+            }
+        }, 1000);
+
+        // Função para gerar uma posição aleatória para os mosquitos
+        function posicaoRandomica() {
+            if (document.getElementById('mosquito')) {
+                document.getElementById('mosquito').remove();
+
+                if (vidas > 3) {
+                    window.location.href = 'fim_de_jogo.html';
+                } else {
+                    document.getElementById('v' + vidas).src = "imagens/imagens/coracao_vazio.png";
+                    vidas++;
+                }
+            }
+
+            var posicaoX = Math.floor(Math.random() * largura) - 90;
+            var posicaoY = Math.floor(Math.random() * altura) - 90;
+
+            posicaoX = posicaoX < 0 ? 0 : posicaoX;
+            posicaoY = posicaoY < 0 ? 0 : posicaoY;
+
+            // Cria o elemento HTML do mosquito
+            var mosquito = document.createElement('img');
+            mosquito.src = 'imagens/imagens/mosca.png';
+            mosquito.className = tamanhoAleatorio() + ' ' + ladoAleatorio();
+            mosquito.style.left = posicaoX + 'px';
+            mosquito.style.top = posicaoY + 'px';
+            mosquito.style.position = 'absolute';
+            mosquito.id = 'mosquito';
+            mosquito.onclick = function() {
+                this.remove();
+            };
+
+            document.body.appendChild(mosquito);
+        }
+
+        // Função para definir o tamanho aleatório do mosquito
+        function tamanhoAleatorio() {
+            var classe = Math.floor(Math.random() * 3);
+            switch (classe) {
+                case 0:
+                    return 'mosquito1';
+                case 1:
+                    return 'mosquito2';
+                case 2:
+                    return 'mosquito3';
+            }
+        }
+
+        // Função para definir a direção aleatória do mosquito
+        function ladoAleatorio() {
+            var classe = Math.floor(Math.random() * 2);
+            switch (classe) {
+                case 0:
+                    return 'ladoA';
+                case 1:
+                    return 'ladoB';
+            }
+        }
+
+        // Variáveis de controle de vidas
+        var vidas = 1;
+    </script>
+
+</body>
+</html>
